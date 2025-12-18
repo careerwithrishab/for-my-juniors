@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useExperienceFormStore } from "@/store/experience-store";
 import { InterviewExperience, InterviewRound, Difficulty } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,9 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Plus, Trash2, Star, Building2, Briefcase, GraduationCap, Target, FileText } from "lucide-react";
+import { ArrowRight, Plus, Trash2, Star, Building2, Briefcase, GraduationCap, Target, FileText, Sparkles, X } from "lucide-react";
+import { normalizeRole, normalizeCompany, LLMSuggestion } from "@/lib/llm";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface InterviewWizardProps {
   step: number;
@@ -80,11 +82,87 @@ function DifficultySelector({
   );
 }
 
+// Inline AI suggestion component
+function InlineSuggestion({
+  suggestion,
+  onApply,
+  onDismiss,
+}: {
+  suggestion: LLMSuggestion | null;
+  onApply: () => void;
+  onDismiss: () => void;
+}) {
+  if (!suggestion) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: -5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -5 }}
+        className="flex items-center gap-2 mt-1.5 text-sm"
+      >
+        <Sparkles className="h-3.5 w-3.5 text-primary" />
+        <span className="text-muted-foreground">Did you mean</span>
+        <button
+          type="button"
+          onClick={onApply}
+          className="font-medium text-primary hover:underline"
+        >
+          {suggestion.suggestion}
+        </button>
+        <span className="text-muted-foreground">?</span>
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 export function InterviewWizard({ step }: InterviewWizardProps) {
   const { formData, updateFormData, nextStep } = useExperienceFormStore();
   const data = formData as Partial<InterviewExperience>;
 
   const [rounds, setRounds] = useState<InterviewRound[]>(data.rounds || []);
+  
+  // AI suggestions state
+  const [roleSuggestion, setRoleSuggestion] = useState<LLMSuggestion | null>(null);
+  const [companySuggestion, setCompanySuggestion] = useState<LLMSuggestion | null>(null);
+  
+  // Debounced role suggestion
+  useEffect(() => {
+    if (!data.role || data.role.length < 2) {
+      setRoleSuggestion(null);
+      return;
+    }
+    
+    const timer = setTimeout(() => {
+      const suggestion = normalizeRole(data.role || "");
+      setRoleSuggestion(suggestion);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [data.role]);
+  
+  // Debounced company suggestion
+  useEffect(() => {
+    if (!data.companyName || data.companyName.length < 2) {
+      setCompanySuggestion(null);
+      return;
+    }
+    
+    const timer = setTimeout(() => {
+      const suggestion = normalizeCompany(data.companyName || "");
+      setCompanySuggestion(suggestion);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [data.companyName]);
 
   const addRound = () => {
     const newRound: InterviewRound = {
@@ -188,6 +266,16 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
               onChange={(e) => updateFormData("role", e.target.value)}
               className="mt-1.5"
             />
+            <InlineSuggestion
+              suggestion={roleSuggestion}
+              onApply={() => {
+                if (roleSuggestion) {
+                  updateFormData("role", roleSuggestion.suggestion);
+                  setRoleSuggestion(null);
+                }
+              }}
+              onDismiss={() => setRoleSuggestion(null)}
+            />
           </div>
 
           <div>
@@ -239,6 +327,16 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
               value={data.companyName || ""}
               onChange={(e) => updateFormData("companyName", e.target.value)}
               className="mt-1.5"
+            />
+            <InlineSuggestion
+              suggestion={companySuggestion}
+              onApply={() => {
+                if (companySuggestion) {
+                  updateFormData("companyName", companySuggestion.suggestion);
+                  setCompanySuggestion(null);
+                }
+              }}
+              onDismiss={() => setCompanySuggestion(null)}
             />
           </div>
 
