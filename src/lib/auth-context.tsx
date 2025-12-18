@@ -9,7 +9,7 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import { auth, googleProvider, db } from "./firebase";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 // User role types
 export type UserRole = "USER" | "ADMIN";
@@ -75,6 +75,12 @@ const extractDomainInfo = (email: string) => {
   };
 };
 
+// Admin emails - these users get ADMIN role automatically on first sign-in
+const ADMIN_EMAILS = [
+  "careerwithrishab@gmail.com",
+  // Add more admin emails here
+];
+
 // Generate a random username
 const generateUsername = () => {
   const adjectives = ["Swift", "Bright", "Calm", "Bold", "Keen", "Wise"];
@@ -96,6 +102,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     if (userSnap.exists()) {
       const data = userSnap.data();
+      const email = firebaseUser.email?.toLowerCase() || "";
+      
+      // Check if existing user should be upgraded to admin
+      const shouldBeAdmin = ADMIN_EMAILS.includes(email);
+      if (shouldBeAdmin && data.role !== "ADMIN") {
+        // Upgrade to admin
+        await updateDoc(userRef, { 
+          role: "ADMIN",
+          updatedAt: serverTimestamp() 
+        });
+        data.role = "ADMIN";
+        console.log("User upgraded to ADMIN:", email);
+      }
+      
       setUserData({
         ...data,
         createdAt: data.createdAt?.toDate() || new Date(),
@@ -106,6 +126,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const email = firebaseUser.email || "";
       const domainInfo = extractDomainInfo(email);
       
+      // Check if user should be admin
+      const isAdmin = ADMIN_EMAILS.includes(email.toLowerCase());
+      
       const newUserData: Omit<UserData, "createdAt" | "updatedAt"> & {
         createdAt: ReturnType<typeof serverTimestamp>;
         updatedAt: ReturnType<typeof serverTimestamp>;
@@ -114,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: email,
         displayName: firebaseUser.displayName,
         username: generateUsername(),
-        role: "USER",
+        role: isAdmin ? "ADMIN" : "USER",
         emailVerified: firebaseUser.emailVerified,
         collegeVerified: domainInfo.isCollegeEmail,
         companyVerified: domainInfo.isCompanyEmail,
