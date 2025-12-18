@@ -12,6 +12,10 @@ import { ArrowLeft } from "lucide-react";
 // Steps
 import { TypeSelector } from "@/components/submit/type-selector";
 import { InterviewWizard } from "@/components/submit/interview-wizard";
+import { WorkWizard } from "@/components/submit/work-wizard";
+import { TransitionWizard } from "@/components/submit/transition-wizard";
+import { LearningWizard } from "@/components/submit/learning-wizard";
+import { OpenWizard } from "@/components/submit/open-wizard";
 import { ReviewStep } from "@/components/submit/review-step";
 
 export default function SubmitPage() {
@@ -61,7 +65,26 @@ export default function SubmitPage() {
           return <ReviewStep />;
         }
         return <InterviewWizard step={currentStep} />;
-      // Add other types here
+      case "WORK":
+        if (currentStep === totalSteps) {
+          return <ReviewStep />;
+        }
+        return <WorkWizard step={currentStep} />;
+      case "TRANSITION":
+        if (currentStep === totalSteps) {
+          return <ReviewStep />;
+        }
+        return <TransitionWizard step={currentStep} />;
+      case "LEARNING":
+        if (currentStep === totalSteps) {
+          return <ReviewStep />;
+        }
+        return <LearningWizard step={currentStep} />;
+      case "OPEN":
+        if (currentStep === totalSteps) {
+          return <ReviewStep />;
+        }
+        return <OpenWizard step={currentStep} />;
       default:
         return <TypeSelector />;
     }
