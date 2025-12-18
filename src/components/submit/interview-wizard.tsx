@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Plus, Trash2, Star, Building2, Briefcase, Calendar, GraduationCap, Target, FileText } from "lucide-react";
+import { ArrowRight, Plus, Trash2, Star, Building2, Briefcase, GraduationCap, Target, FileText } from "lucide-react";
 
 interface InterviewWizardProps {
   step: number;
@@ -96,7 +96,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
     };
     const updated = [...rounds, newRound];
     setRounds(updated);
-    updateFormData("rounds" as keyof InterviewExperience, updated as InterviewExperience["rounds"]);
+    updateFormData("rounds", updated);
   };
 
   const updateRound = (index: number, field: keyof InterviewRound, value: unknown) => {
@@ -104,7 +104,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
       i === index ? { ...r, [field]: value } : r
     );
     setRounds(updated);
-    updateFormData("rounds" as keyof InterviewExperience, updated as InterviewExperience["rounds"]);
+    updateFormData("rounds", updated);
   };
 
   const removeRound = (index: number) => {
@@ -112,7 +112,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
       .filter((_, i) => i !== index)
       .map((r, i) => ({ ...r, roundNumber: i + 1 }));
     setRounds(updated);
-    updateFormData("rounds" as keyof InterviewExperience, updated as InterviewExperience["rounds"]);
+    updateFormData("rounds", updated);
   };
 
   const canProceed = () => {
@@ -169,7 +169,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
                       ? "border-primary bg-primary/5"
                       : "hover:border-primary/50"
                   }`}
-                  onClick={() => updateFormData("interviewType" as keyof InterviewExperience, option.value as InterviewExperience["interviewType"])}
+                  onClick={() => updateFormData("interviewType", option.value)}
                 >
                   <CardContent className="p-4 text-center">
                     <span className="font-medium">{option.label}</span>
@@ -185,7 +185,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
               id="role"
               placeholder="e.g., Software Engineer, Data Analyst"
               value={data.role || ""}
-              onChange={(e) => updateFormData("role" as keyof InterviewExperience, e.target.value as InterviewExperience["role"])}
+              onChange={(e) => updateFormData("role", e.target.value)}
               className="mt-1.5"
             />
           </div>
@@ -194,7 +194,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
             <Label>Employment Type</Label>
             <Select
               value={data.employmentType}
-              onValueChange={(value) => updateFormData("employmentType" as keyof InterviewExperience, value as InterviewExperience["employmentType"])}
+              onValueChange={(value) => updateFormData("employmentType", value)}
             >
               <SelectTrigger className="mt-1.5">
                 <SelectValue placeholder="Select type" />
@@ -237,7 +237,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
               id="company"
               placeholder="e.g., Google, Microsoft, Flipkart"
               value={data.companyName || ""}
-              onChange={(e) => updateFormData("companyName" as keyof InterviewExperience, e.target.value as InterviewExperience["companyName"])}
+              onChange={(e) => updateFormData("companyName", e.target.value)}
               className="mt-1.5"
             />
           </div>
@@ -247,7 +247,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
               <Label>Month</Label>
               <Select
                 value={data.interviewMonth?.toString()}
-                onValueChange={(value) => updateFormData("interviewMonth" as keyof InterviewExperience, parseInt(value) as InterviewExperience["interviewMonth"])}
+                onValueChange={(value) => updateFormData("interviewMonth", parseInt(value))}
               >
                 <SelectTrigger className="mt-1.5">
                   <SelectValue placeholder="Month" />
@@ -265,7 +265,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
               <Label>Year</Label>
               <Select
                 value={data.interviewYear?.toString()}
-                onValueChange={(value) => updateFormData("interviewYear" as keyof InterviewExperience, parseInt(value) as InterviewExperience["interviewYear"])}
+                onValueChange={(value) => updateFormData("interviewYear", parseInt(value))}
               >
                 <SelectTrigger className="mt-1.5">
                   <SelectValue placeholder="Year" />
@@ -285,7 +285,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
             <Label>How did you find this opportunity?</Label>
             <Select
               value={data.opportunitySource}
-              onValueChange={(value) => updateFormData("opportunitySource" as keyof InterviewExperience, value as InterviewExperience["opportunitySource"])}
+              onValueChange={(value) => updateFormData("opportunitySource", value)}
             >
               <SelectTrigger className="mt-1.5">
                 <SelectValue placeholder="Select source" />
@@ -329,7 +329,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
               id="designation"
               placeholder="e.g., Final Year Student, SDE-1 at XYZ"
               value={data.designation || ""}
-              onChange={(e) => updateFormData("designation" as keyof InterviewExperience, e.target.value as InterviewExperience["designation"])}
+              onChange={(e) => updateFormData("designation", e.target.value)}
               className="mt-1.5"
             />
           </div>
@@ -351,7 +351,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
                       ? "border-primary bg-primary/5"
                       : "hover:border-primary/50"
                   }`}
-                  onClick={() => updateFormData("experienceLevel" as keyof InterviewExperience, option.value as InterviewExperience["experienceLevel"])}
+                  onClick={() => updateFormData("experienceLevel", option.value)}
                 >
                   <CardContent className="p-3 text-center">
                     <span className="text-sm font-medium">{option.label}</span>
@@ -489,7 +489,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
             <div className="mt-2">
               <DifficultySelector
                 value={data.overallDifficulty || 3}
-                onChange={(d) => updateFormData("overallDifficulty" as keyof InterviewExperience, d as InterviewExperience["overallDifficulty"])}
+                onChange={(d) => updateFormData("overallDifficulty", d)}
               />
             </div>
           </div>
@@ -500,7 +500,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
               id="tips"
               placeholder="What would you suggest others to prepare? Resources, topics, strategies..."
               value={data.preparationTips || ""}
-              onChange={(e) => updateFormData("preparationTips" as keyof InterviewExperience, e.target.value as InterviewExperience["preparationTips"])}
+              onChange={(e) => updateFormData("preparationTips", e.target.value)}
               className="mt-1.5 min-h-[120px]"
             />
           </div>
@@ -544,7 +544,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
                       ? option.color
                       : "hover:border-primary/50"
                   }`}
-                  onClick={() => updateFormData("outcome" as keyof InterviewExperience, option.value as InterviewExperience["outcome"])}
+                  onClick={() => updateFormData("outcome", option.value)}
                 >
                   <CardContent className="p-4 text-center">
                     <span className="font-medium">{option.label}</span>
@@ -561,7 +561,7 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
                 id="offer"
                 placeholder="CTC, location, joining date, etc. (keep it anonymous)"
                 value={data.offerDetails || ""}
-                onChange={(e) => updateFormData("offerDetails" as keyof InterviewExperience, e.target.value as InterviewExperience["offerDetails"])}
+                onChange={(e) => updateFormData("offerDetails", e.target.value)}
                 className="mt-1.5"
               />
             </div>
@@ -577,4 +577,3 @@ export function InterviewWizard({ step }: InterviewWizardProps) {
 
   return null;
 }
-

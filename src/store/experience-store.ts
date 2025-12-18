@@ -15,7 +15,7 @@ interface ExperienceFormState {
   // Actions
   setExperienceType: (type: ExperienceType) => void;
   setFormData: (data: Partial<ExperienceData>) => void;
-  updateFormData: <K extends keyof ExperienceData>(key: K, value: ExperienceData[K]) => void;
+  updateFormData: (key: string, value: unknown) => void;
   setSummary: (summary: string) => void;
   nextStep: () => void;
   prevStep: () => void;

@@ -29,13 +29,13 @@ import {
 
 // Helper to convert Firestore timestamps
 const convertTimestamps = <T extends DocumentData>(data: T): T => {
-  const converted = { ...data };
+  const converted = { ...data } as Record<string, unknown>;
   Object.keys(converted).forEach((key) => {
     if (converted[key] instanceof Timestamp) {
-      converted[key] = converted[key].toDate();
+      converted[key] = (converted[key] as Timestamp).toDate();
     }
   });
-  return converted;
+  return converted as T;
 };
 
 // ============ EXPERIENCES ============
